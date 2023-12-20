@@ -52,7 +52,7 @@ namespace dae {
 	{
 		if (!m_IsInitialized)
 			return;
-
+	
 		//1. Clear RTV & DSV
 		constexpr float color[4] = { 0.f, 0.f, 0.5f, 1.f };
 		m_pDeviceContext->ClearRenderTargetView(m_RenderTargetView, color);

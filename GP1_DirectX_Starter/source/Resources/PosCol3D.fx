@@ -5,18 +5,12 @@ struct VS_INPUT
 {
     float3 Position : POSITION;
     float3 Color : COLOR;
-    //float2 UV : TEXCOORD;
-    //float3 Normal : NORMAL;
-    //float3 Tangent : TANGENT;
 };
 
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
     float3 Color : COLOR;
-    //float2 UV : TEXCOORD;
-   // float3 Normal : NORMAL;
-    //float3 Tangent : TANGENT;
 };
 
 // -----------------------------------------------------
