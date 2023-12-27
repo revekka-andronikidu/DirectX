@@ -146,14 +146,47 @@ namespace dae {
 
 	Matrix Matrix::CreateLookAtLH(const Vector3& origin, const Vector3& forward, const Vector3& up)
 	{
-		assert(false && "Not Implemented");
-		return {};
+		/*
+		* directX implementation
+			xaxis = normal(cross(Up, zaxis))
+			yaxis = cross(zaxis, xaxis)
+			zaxis = normal(At - Eye)
+
+			xaxis.x           yaxis.x           zaxis.x          0
+			xaxis.y           yaxis.y           zaxis.y          0
+			xaxis.z           yaxis.z           zaxis.z          0
+			- dot(xaxis, eye) - dot(yaxis, eye) - dot(zaxis, eye)  1
+			*/
+
+
+		 Vector3 right = Vector3::Cross(up, forward);
+		 right.Normalize();
+		 Vector3 upward = Vector3::Cross(forward, right);
+		 upward.Normalize();
+		 Vector3 forwar2 = forward.Normalized();
+
+		const Matrix ONB
+		{
+			{ right, 0 },
+			{ upward, 0 },
+			{forwar2, 0},
+			{- Vector3::Dot(right, origin),-Vector3::Dot(upward, origin),-Vector3::Dot(forwar2, origin), 1}
+		};
+		
+		return ONB;
 	}
 
-	Matrix Matrix::CreatePerspectiveFovLH(float fov, float aspect, float zn, float zf)
+	Matrix Matrix::CreatePerspectiveFovLH(float fov, float aspect, float zn, float zf) 
 	{
-		assert(false && "Not Implemented");
-		return {};
+		Matrix projectionMatrix
+		{
+			{1.f / (fov * aspect), 0.f , 0.f, 0.f},
+			{0.f, 1.f / fov, 0.f, 0.f},
+			{0.f, 0.f, zf / (zf - zn), 1.f},
+			{0.f, 0.f, -(zf * zn) / (zf - zn), 0.f}
+		};
+
+		return projectionMatrix;
 	}
 
 	Vector3 Matrix::GetAxisX() const

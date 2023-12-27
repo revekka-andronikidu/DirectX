@@ -5,9 +5,10 @@ namespace dae
 {
 	struct ColorRGB
 	{
+		float b{};
 		float r{};
 		float g{};
-		float b{};
+		//float b{};
 		
 
 		void MaxToOne()

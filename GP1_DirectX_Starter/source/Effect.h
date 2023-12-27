@@ -1,25 +1,36 @@
 #pragma once
-class Effect 
+
+namespace dae 
 {
-public:
-	Effect(ID3D11Device* pDevice, const std::wstring& assetFile);
-	~Effect();
+	class Matrix;
+	class Texture2D;
 
-	Effect(const Effect& other) = delete;
-	Effect& operator=(const Effect& other) = delete;
-	Effect(Effect&& other) = delete;
-	Effect& operator=(Effect&& other) = delete;
+	class Effect
+	{
+	public:
+		Effect(ID3D11Device* pDevice, const std::wstring& assetFile);
+		~Effect();
 
-	ID3DX11Effect* GetEffect() const;
-	ID3DX11EffectTechnique* GetTechnique() const;
-	ID3D11InputLayout* GetInputLayout() const;
+		Effect(const Effect& other) = delete;
+		Effect& operator=(const Effect& other) = delete;
+		Effect(Effect&& other) = delete;
+		Effect& operator=(Effect&& other) = delete;
 
-private:
-	ID3DX11Effect* m_pEffect{};
-	ID3DX11EffectTechnique* m_pTechnique{};
-	ID3D11InputLayout* m_pInputLayout{};
+		ID3DX11Effect* GetEffect() const;
+		ID3DX11EffectTechnique* GetTechnique() const;
+		ID3D11InputLayout* GetInputLayout() const;
+		void SetWorldViewProjectionMatrix(const dae::Matrix& matrix);
+		void SetDiffuseMap(Texture2D* pDiffuseTexture);
 
-	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
+	private:
+		ID3DX11Effect* m_pEffect{};
+		ID3DX11EffectTechnique* m_pTechnique{};
+		
+		ID3DX11EffectMatrixVariable* m_pMatWorldViewProjVariable{};
+		ID3DX11EffectShaderResourceVariable* m_pDiffuseMapVariable{};
 
+		static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
+
+	};
 };
 

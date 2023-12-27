@@ -1,12 +1,15 @@
 #pragma once
+#include "Camera.h"
 
 struct SDL_Window;
 struct SDL_Surface;
 
-class Mesh;
-
 namespace dae
 {
+	class Mesh;
+	class Effect;
+	class Texture2D;
+
 	class Renderer final
 	{
 	public:
@@ -41,7 +44,13 @@ namespace dae
 		ID3D11Resource* m_pRenderTargetBuffer;
 		ID3D11RenderTargetView* m_RenderTargetView;
 
-
+		Camera m_Camera;
 		Mesh* m_pMesh{};
+		Texture2D* m_pTexture;
+		Effect* m_pEffect;
+
+		bool m_EnableRotating{false};
+
+		bool m_F5Held;
 	};
 }

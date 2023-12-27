@@ -40,6 +40,9 @@
     <ClInclude Include="HelperFunctions.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Texture2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -62,5 +65,6 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
 </Project>

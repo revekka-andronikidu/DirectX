@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "Mesh.h"
+#include "Math.h"
+#include "Effect.h"
+#include "Texture2D.h"
 
 namespace dae {
 
@@ -22,17 +25,47 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
+		m_Camera.Initialize(45.f, { 0.f,0.f,-10.f }, static_cast<float>(m_Width / m_Height));		
+
 		//Create some data for our mesh
-		std::vector<Vertex_PosCol> vertices
+		/*std::vector<Vertex_PosCol> vertices
 		{
-			{{0.0f, 0.5f, 0.5f}, {colors::Red}},
-			{{0.5f, -0.5f, 0.5f}, {colors::Blue}},
-			{{-0.5f, -0.5f, 0.5f}, {colors::Green}},
+			{{0.0f, 3.0f,2.0f}, {colors::Red}},
+			{{3.0f, -3.0f,2.0f}, {colors::Blue}},
+			{{-3.0f, -3.0f, 2.0f}, {colors::Green}},
 		};
 		
-		std::vector<uint32_t> indices{ 0,1,2 };
+		std::vector<uint32_t> indices{ 0,1,2 };*/
+
+
+		std::vector<Vertex_PosCol> vertices
+		{
+			{{ -3.0f,  3.0f, 2.0f},{},{ 0.0f, 0.0f}},
+			{{  0.0f,  3.0f, 2.0f},{},{ 0.5f, 0.0f}},
+			{{  3.0f,  3.0f, 2.0f},{},{ 1.0f, 0.0f}},
+			{{ -3.0f,  0.0f, 2.0f},{},{ 0.0f, 0.5f}},
+			{{  0.0f,  0.0f, 2.0f},{},{ 0.5f, 0.5f}},
+			{{  3.0f,  0.0f, 2.0f},{},{ 1.0f, 0.5f}},
+			{{ -3.0f, -3.0f, 2.0f},{},{ 0.0f, 1.0f}},
+			{{  0.0f, -3.0f, 2.0f},{},{ 0.5f, 1.0f}},
+			{{  3.0f, -3.0f, 2.0f},{},{ 1.0f, 1.0f}},
+		};
+
+
+		std::vector<uint32_t> indices
+		{
+				3,0,1,   1,4,3,   4,1,2,
+				2,5,4,   6,3,4,   4,7,6,
+				7,4,5,   5,8,7,
+		};
+
+		m_pTexture = new Texture2D(m_pDevice, "Resources/uv_grid_2.png");
+		m_pEffect = new Effect(m_pDevice, L"Resources/PosCol3D.fx");
+		m_pEffect->SetDiffuseMap(m_pTexture);
+
 		
-		m_pMesh = new Mesh(m_pDevice, vertices, indices);
+		m_pMesh = new Mesh(m_pDevice, vertices, indices, m_pEffect);
+
 	}
 
 	Renderer::~Renderer()
@@ -40,11 +73,50 @@ namespace dae {
 		DeleteResourceLeaks();
 
 		delete m_pMesh;
+		delete m_pTexture;
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
-		
+		m_Camera.Update(pTimer);
+
+		constexpr const float rotationSpeed{ 30.f };
+		if (m_EnableRotating)
+		{
+			//for (const auto& pMesh : m_pMeshes)
+			//{
+			m_pMesh->RotateY(rotationSpeed * TO_RADIANS * pTimer->GetElapsed());
+			
+			//}
+		}
+		m_pMesh->UpdateViewMatrices(m_Camera.GetWorldViewProjection(), m_Camera.GetInverseViewMatrix());
+
+		const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
+
+		/*if (pKeyboardState[SDL_SCANCODE_F2])
+		{
+			if (!m_F2Held)
+			{
+				for (const auto& pMesh : m_pMeshes)
+				{
+					pMesh->CycleFilteringMethods();
+				}
+			}
+			m_F2Held = true;
+		}
+		else m_F2Held = false;*/
+
+		if (pKeyboardState[SDL_SCANCODE_F5])
+		{
+			if (!m_F5Held)
+			{
+				m_EnableRotating = !m_EnableRotating;
+				std::cout << "[ROTATION] ";
+				std::cout << (m_EnableRotating ? "Rotation enabled\n" : "Rotation disabled\n");
+			}
+			m_F5Held = true;
+		}
+		else m_F5Held = false;
 	}
 
 
