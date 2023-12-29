@@ -43,6 +43,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Texture2D.h" />
+    <ClInclude Include="ShadedEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -66,5 +67,6 @@
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Texture2D.cpp" />
+    <ClCompile Include="ShadedEffect.cpp" />
   </ItemGroup>
 </Project>

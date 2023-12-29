@@ -9,9 +9,11 @@ namespace dae
 		m_pEffect(LoadEffect(pDevice, assetFile))
 
 	{
-		m_pTechnique = m_pEffect->GetTechniqueByName("DefaultTechnique");
+		m_pTechnique = m_pEffect->GetTechniqueByName("PointFilteringTechnique");
 		if (!m_pTechnique->IsValid())
 			std::wcout << L"Technique not valid\n";
+		//else
+			//std::wcout << L"[FILTERINGMETHOD] Point\n";
 
 		m_pMatWorldViewProjVariable = m_pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
 		if (!m_pMatWorldViewProjVariable->IsValid())
@@ -20,9 +22,8 @@ namespace dae
 		m_pDiffuseMapVariable = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
 		if (!m_pDiffuseMapVariable->IsValid())
 		{
-			std::wcout << L"m_pDiffuseMapVariable not valid\n";
+			std::wcout << L"m_pDiffuseMapVariable not valid!\n";
 		}
-
 
 	}
 
@@ -66,6 +67,33 @@ namespace dae
 			m_pDiffuseMapVariable->SetResource(pDiffuseTexture->GetShaderResourceView());
 		
 	}
+
+	void Effect::CycleFilteringMethods()
+	{
+
+		m_FilteringMethod = static_cast<FilteringMethod>((static_cast<int>(m_FilteringMethod) + 1) % (static_cast<int>(FilteringMethod::END)));
+
+		std::cout << "[FILTERINGMETHOD] ";
+		switch (m_FilteringMethod)
+		{
+		case Effect::FilteringMethod::Point:
+			m_pTechnique = m_pEffect->GetTechniqueByName("PointFilteringTechnique");
+			if (!m_pTechnique->IsValid()) std::wcout << L"PointTechnique not valid\n";
+			std::cout << "Point\n";
+			break;
+		case Effect::FilteringMethod::Linear:
+			m_pTechnique = m_pEffect->GetTechniqueByName("LinearFilteringTechnique");
+			if (!m_pTechnique->IsValid()) std::wcout << L"LinearTechnique not valid\n";
+			std::cout << "Linear\n";
+			break;
+		case Effect::FilteringMethod::Anisotropic:
+			m_pTechnique = m_pEffect->GetTechniqueByName("AnisotropicFilteringTechnique");
+			if (!m_pTechnique->IsValid()) std::wcout << L"AnisotropicTechnique not valid\n";
+			std::cout << "Anisotropic\n";
+			break;
+		}
+	}
+
 
 	ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	{

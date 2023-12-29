@@ -46,11 +46,15 @@ namespace dae
 
 		Camera m_Camera;
 		Mesh* m_pMesh{};
-		Texture2D* m_pTexture;
+		/*Texture2D* m_pDiffuseTexture;
+		Texture2D* m_pGlossines;
+		Texture2D* m_pNormalMap;
+		Texture2D* m_pSpecular;*/
 		Effect* m_pEffect;
 
 		bool m_EnableRotating{false};
 
-		bool m_F5Held;
+		bool m_F5Held{false};
+		bool m_F2Held{false};
 	};
 }

@@ -11,7 +11,7 @@ namespace dae
 	{
 	public:
 		Mesh(ID3D11Device* pDevice, std::vector<Vertex_PosCol> vertices, std::vector<uint32_t> indices, Effect* pEffect);
-		//Mesh(ID3D11Device* pDevice, const std::string& objFilePath, Effect* pEffect);
+		Mesh(ID3D11Device* pDevice, const std::string& objFilePath, Effect* pEffect);
 		Mesh(const Mesh& other) = delete;
 		Mesh& operator=(const Mesh& other) = delete;
 		Mesh(Mesh&& other) = delete;
@@ -24,6 +24,7 @@ namespace dae
 		void RotateZ(float roll);
 		void Render(ID3D11DeviceContext* pDeviceContext) const;
 		void UpdateViewMatrices(const Matrix& viewProjectionMatrix, const Matrix& inverseViewMatrix);
+		void CycleFilteringMethods();
 
 	private:
 		ID3D11Device* m_pDevice{};

@@ -12,7 +12,7 @@ namespace dae
 		Texture2D(Texture2D&& other) = delete;
 		Texture2D& operator=(Texture2D&& other) = delete;
 
-		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; };
+		ID3D11ShaderResourceView* GetShaderResourceView() const;
 
 	private:
 		ID3D11ShaderResourceView* m_pShaderResourceView{};

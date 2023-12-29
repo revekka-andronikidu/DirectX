@@ -57,6 +57,10 @@ namespace dae
 		SAFE_RELEASE(m_pShaderResourceView);
 	}
 
+	ID3D11ShaderResourceView* Texture2D::GetShaderResourceView() const
+	{
+		return m_pShaderResourceView; 
+	}
 
 
 

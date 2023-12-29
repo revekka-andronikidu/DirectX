@@ -13,7 +13,7 @@ namespace dae
 	{
 		Camera() = default;
 
-		Camera(const Vector3& _origin, float _fovAngle):
+		Camera(float _fovAngle, const Vector3& _origin):
 			origin{_origin},
 			fovAngle{_fovAngle}
 		{

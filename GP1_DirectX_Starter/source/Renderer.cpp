@@ -4,6 +4,7 @@
 #include "Math.h"
 #include "Effect.h"
 #include "Texture2D.h"
+#include "ShadedEffect.h"
 
 namespace dae {
 
@@ -25,46 +26,61 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
-		m_Camera.Initialize(45.f, { 0.f,0.f,-10.f }, static_cast<float>(m_Width / m_Height));		
+		m_Camera.Initialize(45.f, { 0.f,0.f,-50.f }, static_cast<float>(m_Width) / m_Height);		
 
 		//Create some data for our mesh
-		/*std::vector<Vertex_PosCol> vertices
+		std::vector<Vertex_PosCol> vertices
 		{
 			{{0.0f, 3.0f,2.0f}, {colors::Red}},
 			{{3.0f, -3.0f,2.0f}, {colors::Blue}},
 			{{-3.0f, -3.0f, 2.0f}, {colors::Green}},
 		};
+			
 		
-		std::vector<uint32_t> indices{ 0,1,2 };*/
+		std::vector<uint32_t> indices{0,1, 2};
 
-
-		std::vector<Vertex_PosCol> vertices
+	
+		/*std::vector<Vertex_PosCol> vertices
 		{
-			{{ -3.0f,  3.0f, 2.0f},{},{ 0.0f, 0.0f}},
-			{{  0.0f,  3.0f, 2.0f},{},{ 0.5f, 0.0f}},
-			{{  3.0f,  3.0f, 2.0f},{},{ 1.0f, 0.0f}},
-			{{ -3.0f,  0.0f, 2.0f},{},{ 0.0f, 0.5f}},
-			{{  0.0f,  0.0f, 2.0f},{},{ 0.5f, 0.5f}},
-			{{  3.0f,  0.0f, 2.0f},{},{ 1.0f, 0.5f}},
-			{{ -3.0f, -3.0f, 2.0f},{},{ 0.0f, 1.0f}},
-			{{  0.0f, -3.0f, 2.0f},{},{ 0.5f, 1.0f}},
-			{{  3.0f, -3.0f, 2.0f},{},{ 1.0f, 1.0f}},
+			{{ -3.0f,  3.0f, -2.0f},{1,1,1},{ 0.0f, 0.0f}},
+			{ {  0.0f,  3.0f, -2.0f},{1,1,1},{ 0.5f, 0.0f} },
+			{ {  3.0f,  3.0f, -2.0f},{1,1,1},{ 1.0f, 0.0f} },
+			{ { -3.0f,  0.0f, -2.0f},{1,1,1},{ 0.0f, 0.5f} },
+			{ {  0.0f,  0.0f, -2.0f},{1,1,1},{ 0.5f, 0.5f} },
+			{ {  3.0f,  0.0f, -2.0f},{1,1,1},{ 1.0f, 0.5f} },
+			{ { -3.0f, -3.0f, -2.0f},{1,1,1},{ 0.0f, 1.0f} },
+			{ {  0.0f, -3.0f, -2.0f},{1,1,1},{ 0.5f, 1.0f} },
+			{ {  3.0f, -3.0f, -2.0f},{1,1,1},{ 1.0f, 1.0f} },
+		
 		};
-
-
 		std::vector<uint32_t> indices
 		{
-				3,0,1,   1,4,3,   4,1,2,
+			3,0,1,   1,4,3,   4,1,2,
 				2,5,4,   6,3,4,   4,7,6,
-				7,4,5,   5,8,7,
-		};
+			7,4,5,   5,8,7,
+		};*/
+				
+		
+		ShadedEffect* pVehicleEffect = new ShadedEffect{m_pDevice, L"Resources/PosCol3D.fx" };
 
-		m_pTexture = new Texture2D(m_pDevice, "Resources/uv_grid_2.png");
+		Texture2D vehicleDiffuseTexture{ m_pDevice, "Resources/vehicle_diffuse.png" };
+		Texture2D vehicleGlossinesTexture{ m_pDevice, "Resources/vehicle_gloss.png" };
+		Texture2D vehicleNormalMap{ m_pDevice, "Resources/vehicle_normal.png" };
+		Texture2D vehicleSpecular{ m_pDevice, "Resources/vehicle_specular.png" };
+
+		pVehicleEffect->SetDiffuseMap(&vehicleDiffuseTexture);
+		pVehicleEffect->SetGlossinessMap(&vehicleGlossinesTexture);
+		pVehicleEffect->SetNormalMap(&vehicleNormalMap);
+		pVehicleEffect->SetSpecularMap(&vehicleSpecular);
+
 		m_pEffect = new Effect(m_pDevice, L"Resources/PosCol3D.fx");
-		m_pEffect->SetDiffuseMap(m_pTexture);
+		Texture2D uvGrid{ m_pDevice, "Resources/uv_grid_2.png" };
+		m_pEffect->SetDiffuseMap(&uvGrid);
 
 		
-		m_pMesh = new Mesh(m_pDevice, vertices, indices, m_pEffect);
+		m_pMesh = new Mesh(m_pDevice, "Resources/vehicle.obj", pVehicleEffect);
+
+		//m_pMesh = new Mesh(m_pDevice,vertices, indices, m_pEffect);
 
 	}
 
@@ -73,7 +89,11 @@ namespace dae {
 		DeleteResourceLeaks();
 
 		delete m_pMesh;
-		delete m_pTexture;
+		//delete m_pDiffuseTexture;
+		//delete m_pGlossines;
+		//delete m_pNormalMap;
+		//delete m_pSpecular;
+		//delete m_pEffect;
 	}
 
 	void Renderer::Update(const Timer* pTimer)
@@ -93,18 +113,18 @@ namespace dae {
 
 		const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
-		/*if (pKeyboardState[SDL_SCANCODE_F2])
+		if (pKeyboardState[SDL_SCANCODE_F2])
 		{
 			if (!m_F2Held)
 			{
-				for (const auto& pMesh : m_pMeshes)
-				{
-					pMesh->CycleFilteringMethods();
-				}
+				//for (const auto& pMesh : m_pMeshes)
+				//{
+					m_pMesh->CycleFilteringMethods();
+				//}
 			}
 			m_F2Held = true;
 		}
-		else m_F2Held = false;*/
+		else m_F2Held = false;
 
 		if (pKeyboardState[SDL_SCANCODE_F5])
 		{
@@ -268,19 +288,6 @@ namespace dae {
 		SAFE_RELEASE(m_pDepthStencilView);
 		SAFE_RELEASE(m_pRenderTargetBuffer);
 		SAFE_RELEASE(m_RenderTargetView);
-
-		/*if (m_pDevice)
-			m_pDevice->Release();
-		if (m_pSwapChain)
-			m_pSwapChain->Release();
-		if (m_pDepthStencilBuffer)
-			m_pDepthStencilBuffer->Release();
-		if (m_pDepthStencilView)
-			m_pDepthStencilView->Release();
-		if (m_pRenderTargetBuffer)
-			m_pRenderTargetBuffer->Release();
-		if (m_RenderTargetView)
-			m_RenderTargetView->Release();*/
 	}
 
 }
