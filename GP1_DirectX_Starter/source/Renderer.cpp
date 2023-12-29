@@ -74,11 +74,11 @@ namespace dae {
 		pVehicleEffect->SetSpecularMap(&vehicleSpecular);
 
 		m_pEffect = new Effect(m_pDevice, L"Resources/PosCol3D.fx");
-		Texture2D uvGrid{ m_pDevice, "Resources/uv_grid_2.png" };
+		Texture2D uvGrid{ m_pDevice, "Resources/vehicle_normal.png" };
 		m_pEffect->SetDiffuseMap(&uvGrid);
 
 		
-		m_pMesh = new Mesh(m_pDevice, "Resources/vehicle.obj", pVehicleEffect);
+		m_pMesh = new Mesh(m_pDevice, "Resources/vehicle.obj", m_pEffect);
 
 		//m_pMesh = new Mesh(m_pDevice,vertices, indices, m_pEffect);
 

@@ -45,11 +45,6 @@ namespace dae
 		return m_pTechnique;
 	}
 
-	/*ID3D11InputLayout* Effect::GetInputLayout() const
-	{
-		return m_pInputLayout;
-	}*/
-
 	void Effect::SetWorldViewProjectionMatrix(const dae::Matrix& matrix)
 	{
 		/*

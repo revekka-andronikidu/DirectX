@@ -95,12 +95,7 @@ namespace dae
 		, m_pEffect{std::move(pEffect)}
 	{
 		
-		/*std::vector<Vertex_PosCol> vertices;
-		std::vector<uint32_t> indices;
-		if (!Utils::ParseOBJ(objFilePath, vertices, indices))
-		{
-			std::cout << "Invalid filepath!\n";
-		}*/
+
 
 		m_pTechnique = m_pEffect->GetTechnique();
 

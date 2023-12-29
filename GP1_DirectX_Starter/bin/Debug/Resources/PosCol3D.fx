@@ -112,7 +112,7 @@ float Phong(float ks, float exp, float3 lightVector, float3 viewDirection,float3
 // -----------------------------------------------------
 //float4 PS(VS_OUTPUT input) : SV_TARGET
 //{
-// const float3 diffuse = gDiffuseMap.Sample(gSamStatePoint, input.TextureUV); 
+// const float3 diffuse = gDiffuseMap.Sample(gSamStatePoint, input.TextureUV);
 // return float4(diffuse, 1.f);
 //}
 
@@ -145,12 +145,16 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
 {
-  return PS_Phong(input,gSamStateLinear); 
+    float3 diffuse = gDiffuseMap.Sample(gSamStateLinear, input.UV);
+    return float4(diffuse, 1.f);
+  //return PS_Phong(input,gSamStateLinear); 
 }
 
 float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
 {
-   return PS_Phong(input, gSamStateAnisotropic);
+    float3 diffuse = gDiffuseMap.Sample(gSamStateAnisotropic, input.UV);
+    return float4(diffuse, 1.f);
+   //return PS_Phong(input, gSamStateAnisotropic);
 }
 
 
