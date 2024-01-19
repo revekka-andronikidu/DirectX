@@ -59,22 +59,22 @@ namespace dae
 			////ONB => invViewMatrix
 			////Inverse(ONB) => ViewMatrix
 
-			//right = Vector3::Cross(Vector3::UnitY, forward);
-			//up = Vector3::Cross(forward, right);
+			right = Vector3::Cross(Vector3::UnitY, forward);
+			up = Vector3::Cross(forward, right);
 
-			//invViewMatrix =
-			//{
-			//	right,
-			//	up,
-			//	forward,
-			//	origin
-			//};
+			invViewMatrix =
+			{
+				right,
+				up,
+				forward,
+				origin
+			};
 
-			//viewMatrix = invViewMatrix.Inverse();
+			viewMatrix = invViewMatrix.Inverse();
 			
 			
 			//DirectX Implementation => https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dxmatrixlookatlh
-			viewMatrix = Matrix::CreateLookAtLH(origin, forward, up);
+			//viewMatrix = Matrix::CreateLookAtLH(origin, forward, up);
 		}
 
 		void CalculateInverseMatrix()

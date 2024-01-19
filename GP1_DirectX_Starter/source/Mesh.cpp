@@ -9,9 +9,9 @@
 namespace dae 
 {
 
-	Mesh::Mesh(ID3D11Device* pDevice, const std::string& objFilePath, Effect* pEffect)
-		: m_pDevice{ pDevice }
-		, m_pEffect{ std::move(pEffect) }
+	Mesh::Mesh(ID3D11Device* pDevice, const std::string& objFilePath, std::unique_ptr<Effect> pEffect)
+		: m_pEffect{ std::move(pEffect) }
+		//, m_pDevice{ pDevice }
 	{
 		std::vector<Vertex_PosCol> vertices;
 		std::vector<uint32_t> indices;
@@ -31,6 +31,11 @@ namespace dae
 		vertexDesc[0].AlignedByteOffset = 0;
 		vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
+		/*vertexDesc[1].SemanticName = "COLOR";
+		vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		vertexDesc[1].AlignedByteOffset = 12;
+		vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;*/
+
 		vertexDesc[1].SemanticName = "TEXCOORD";
 		vertexDesc[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 		vertexDesc[1].AlignedByteOffset = 12;
@@ -42,7 +47,7 @@ namespace dae
 		vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		vertexDesc[3].SemanticName = "TANGENT";
-		vertexDesc[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		vertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		vertexDesc[3].AlignedByteOffset = 32;
 		vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
@@ -91,8 +96,8 @@ namespace dae
 	}
 
 	Mesh::Mesh(ID3D11Device* pDevice, std::vector<Vertex_PosCol> vertices, std::vector<uint32_t> indices, Effect* pEffect)
-		: m_pDevice{pDevice }	
-		, m_pEffect{std::move(pEffect)}
+		: m_pEffect{ std::move(pEffect) }
+		//, m_pDevice{pDevice }	
 	{
 		
 
@@ -168,8 +173,6 @@ namespace dae
 
 	Mesh::~Mesh()
 	{
-		delete m_pEffect;
-
 		SAFE_RELEASE(m_pInputLayout);
 		SAFE_RELEASE(m_pVertexBuffer);
 		SAFE_RELEASE(m_pIndexBuffer);

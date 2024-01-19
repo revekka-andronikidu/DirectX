@@ -30,9 +30,9 @@ namespace dae
 	Effect::~Effect()
 	{
 		
-		SAFE_RELEASE(m_pTechnique);	
-		SAFE_RELEASE(m_pMatWorldViewProjVariable);
-		SAFE_RELEASE(m_pDiffuseMapVariable);
+		//SAFE_RELEASE(m_pTechnique);	
+		//SAFE_RELEASE(m_pMatWorldViewProjVariable);
+		//SAFE_RELEASE(m_pDiffuseMapVariable);
 		SAFE_RELEASE(m_pEffect);
 	}
 

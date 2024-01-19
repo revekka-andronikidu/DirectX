@@ -11,7 +11,7 @@ namespace dae
 	{
 	public:
 		Mesh(ID3D11Device* pDevice, std::vector<Vertex_PosCol> vertices, std::vector<uint32_t> indices, Effect* pEffect);
-		Mesh(ID3D11Device* pDevice, const std::string& objFilePath, Effect* pEffect);
+		Mesh(ID3D11Device* pDevice, const std::string& objFilePath, std::unique_ptr<Effect> pEffect);
 		Mesh(const Mesh& other) = delete;
 		Mesh& operator=(const Mesh& other) = delete;
 		Mesh(Mesh&& other) = delete;
@@ -27,9 +27,13 @@ namespace dae
 		void CycleFilteringMethods();
 
 	private:
-		ID3D11Device* m_pDevice{};
-		Effect* m_pEffect{};
+
+		//ID3D11Device* m_pDevice{};
+
+		std::unique_ptr<Effect> m_pEffect{};
+
 		ID3DX11EffectTechnique* m_pTechnique{};
+
 		ID3D11InputLayout* m_pInputLayout{};
 		ID3D11Buffer* m_pVertexBuffer{};
 		ID3D11Buffer* m_pIndexBuffer{};

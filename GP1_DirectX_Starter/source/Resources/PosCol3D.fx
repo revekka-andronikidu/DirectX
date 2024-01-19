@@ -20,6 +20,9 @@ float gLightIntensity = 7.f;
 
 float gShininess = 25.f;
 
+//Camera
+float3 gCameraPosition;
+
 //Maths
 float PI = float(3.14159265f);
 
@@ -62,7 +65,7 @@ struct VS_OUTPUT
     float4 WorldPosition : TEXCOORD0;
     float2 UV            : TEXCOORD1;
     float3 Normal        : NORMAL;
-    float3 Tangent       :TANGENT;
+    float3 Tangent       : TANGENT;
    
  
    // float4 WorldPosition: WORLDPOSITION;
@@ -98,7 +101,7 @@ float4 Lambert(float kd, float4 cd)
 float Phong(float ks, float exp, float3 lightVector, float3 viewDirection,float3 normal)
 {
     float3 reflection = reflect(lightVector, normal);
-    float cosA = (saturate( dot(reflection, viewDirection)));
+    float cosA = saturate( dot(reflection, viewDirection));
     float specularReflection = 0;
     if (cosA > 0)
     {
@@ -119,42 +122,43 @@ float Phong(float ks, float exp, float3 lightVector, float3 viewDirection,float3
 float4 PS_Phong(VS_OUTPUT input, SamplerState state) : SV_TARGET
 {
     const float3 binormal = cross(input.Normal, input.Tangent);
-    float3 zeroVector = float3(0.0f, 0.0f, 0.0f);
-    float4x3 tangentSpaceAxis = float4x3( float3(input.Tangent), float3(binormal), float3(input.Normal), zeroVector );
+    float4 zeroVector = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float4x4 tangentSpaceAxis = float4x4( float4(input.Tangent, 0.0f), float4(binormal, 0.0f), float4(input.Normal, 0.0f), zeroVector );
 
     const float3 normalSampleVec = (2.0f * gNormalMap.Sample(state, input.UV).rgb - float3(1.f,1.f,1.f) );
-    const float3 normal = normalize(mul(float4(normalSampleVec, 0.f), tangentSpaceAxis));
+    const float3 normal = mul(float4(normalSampleVec, 0.f), tangentSpaceAxis);
 
-    const float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverseMatrix[3].xyz);
+    float3 invViewDirection = normalize(gCameraPosition - input.WorldPosition.xyz);
+   // const float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverseMatrix[3].xyz);
 
     const float observedArea = saturate(dot(normal, -gLightDirection) );
     const float4 lambert = Lambert(1.0f, gDiffuseMap.Sample(state, input.UV));
     const float specularVal = gShininess * gGlossinessMap.Sample(state, input.UV).r ;
-    const float4 specular = gSpecularMap.Sample(state, input.UV) * Phong(1.0f, specularVal, -gLightDirection, viewDirection, input.Normal) ;
+    const float4 specular = gSpecularMap.Sample(state, input.UV) * Phong(1.0f, specularVal, -gLightDirection, invViewDirection, input.Normal);
        
-    return float4((gLightIntensity * lambert + specular) * observedArea);
+    return float4 ((gLightIntensity * lambert + specular) * observedArea);
 }
 
 float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 {
-    float3 diffuse = gDiffuseMap.Sample(gSamStatePoint, input.UV);
-    return float4(diffuse, 1.f);
+    //float3 diffuse = gDiffuseMap.Sample(gSamStatePoint, input.UV);
+    //return float4(diffuse, 1.f);
 
- // return PS_Phong(input,gSamStatePoint); 
+  return PS_Phong(input,gSamStatePoint); 
 }
 
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
 {
-    float3 diffuse = gDiffuseMap.Sample(gSamStateLinear, input.UV);
-    return float4(diffuse, 1.f);
-  //return PS_Phong(input,gSamStateLinear); 
+    //float3 diffuse = gDiffuseMap.Sample(gSamStateLinear, input.UV);
+   // return float4(diffuse, 1.f);
+  return PS_Phong(input,gSamStateLinear); 
 }
 
 float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
 {
-    float3 diffuse = gDiffuseMap.Sample(gSamStateAnisotropic, input.UV);
-    return float4(diffuse, 1.f);
-   //return PS_Phong(input, gSamStateAnisotropic);
+    //float3 diffuse = gDiffuseMap.Sample(gSamStateAnisotropic, input.UV);
+   // return float4(diffuse, 1.f);
+   return PS_Phong(input, gSamStateAnisotropic);
 }
 
 
