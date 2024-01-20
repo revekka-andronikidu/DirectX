@@ -176,6 +176,7 @@ namespace dae
 		SAFE_RELEASE(m_pInputLayout);
 		SAFE_RELEASE(m_pVertexBuffer);
 		SAFE_RELEASE(m_pIndexBuffer);
+		
 	}
 
 	void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
@@ -227,7 +228,13 @@ namespace dae
 	{
 		dae::Matrix world{ m_ScaleMatrix * m_RotationMatrix * m_TranslationMatrix };
 		m_pEffect->SetWorldViewProjectionMatrix(world * viewProjectionMatrix);
+		
 		m_pEffect->SetInverseViewMatrix(inverseViewMatrix);
 		m_pEffect->SetWorldMatrix(world);
+	}
+
+	void Mesh::SetUseNormalMap(bool useNormalMap) const
+	{
+		m_pEffect->SetUseNormalMap(useNormalMap);
 	}
 }

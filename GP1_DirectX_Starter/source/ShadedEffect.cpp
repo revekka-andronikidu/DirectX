@@ -31,10 +31,16 @@ namespace dae {
 			std::wcout << L"m_pWorldVariable not valid!\n";
 		}
 
-		m_pViewInverseVariable = m_pEffect->GetVariableByName("gViewInverseMatrix")->AsMatrix();
-		if (!m_pViewInverseVariable->IsValid())
+		m_pInverseViewVariable = m_pEffect->GetVariableByName("gViewInverseMatrix")->AsMatrix();
+		if (!m_pInverseViewVariable->IsValid())
 		{
-			std::wcout << L"m_pViewInverseVariable not valid!\n";
+			std::wcout << L"m_pInverseViewVariable not valid!\n";
+		}
+
+		m_pUseNormalMap = m_pEffect->GetVariableByName("gUseNormalMap")->AsScalar();
+		if (!m_pUseNormalMap->IsValid())
+		{
+			std::wcout << L"Failed to create Normal Map bool!\n";
 		}
 	}
 
@@ -44,7 +50,7 @@ namespace dae {
 		SAFE_RELEASE(m_pSpecularMapVariable);
 		SAFE_RELEASE(m_pGlossinessMapVariable);
 
-		SAFE_RELEASE(m_pViewInverseVariable);
+		SAFE_RELEASE(m_pInverseViewVariable);
 		SAFE_RELEASE(m_pWorldVariable);
 	}
 
@@ -79,6 +85,11 @@ namespace dae {
 
 	void ShadedEffect::SetInverseViewMatrix(const Matrix& matrix)
 	{
-		m_pWorldVariable->SetMatrix(reinterpret_cast<const float*>(&matrix));
+		m_pInverseViewVariable->SetMatrix(reinterpret_cast<const float*>(&matrix));
+	}
+
+	void ShadedEffect::SetUseNormalMap(bool useNormalMap)
+	{
+		m_pUseNormalMap->SetBool(useNormalMap);
 	}
 };

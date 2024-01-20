@@ -8,6 +8,8 @@ Texture2D gNormalMap : NormalMap;
 Texture2D gSpecularMap : SpecularMap;
 Texture2D gGlossinessMap : GlossinessMap;
 
+bool gUseNormalMap : UseNormalMap;
+
 
 //Matrices
 float4x4 gWorldViewProj : WorldViewProjection;
@@ -113,12 +115,6 @@ float Phong(float ks, float exp, float3 lightVector, float3 viewDirection,float3
 // -----------------------------------------------------
 // Pixel Shader
 // -----------------------------------------------------
-//float4 PS(VS_OUTPUT input) : SV_TARGET
-//{
-// const float3 diffuse = gDiffuseMap.Sample(gSamStatePoint, input.TextureUV);
-// return float4(diffuse, 1.f);
-//}
-
 float4 PS_Phong(VS_OUTPUT input, SamplerState state) : SV_TARGET
 {
     const float3 binormal = cross(input.Normal, input.Tangent);
@@ -126,10 +122,18 @@ float4 PS_Phong(VS_OUTPUT input, SamplerState state) : SV_TARGET
     float4x4 tangentSpaceAxis = float4x4( float4(input.Tangent, 0.0f), float4(binormal, 0.0f), float4(input.Normal, 0.0f), zeroVector );
 
     const float3 normalSampleVec = (2.0f * gNormalMap.Sample(state, input.UV).rgb - float3(1.f,1.f,1.f) );
-    const float3 normal = mul(float4(normalSampleVec, 0.f), tangentSpaceAxis);
+   
+    float3 normal;
+    if(gUseNormalMap)
+    {
+        normal = mul(float4(normalSampleVec, 0.f), tangentSpaceAxis);
+    }
+    else
+    {
+        normal = input.Normal;
+    }
 
-    float3 invViewDirection = normalize(gCameraPosition - input.WorldPosition.xyz);
-   // const float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverseMatrix[3].xyz);
+    const float3 invViewDirection = normalize(gCameraPosition - input.WorldPosition.xyz);
 
     const float observedArea = saturate(dot(normal, -gLightDirection) );
     const float4 lambert = Lambert(1.0f, gDiffuseMap.Sample(state, input.UV));
@@ -143,7 +147,6 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 {
     //float3 diffuse = gDiffuseMap.Sample(gSamStatePoint, input.UV);
     //return float4(diffuse, 1.f);
-
   return PS_Phong(input,gSamStatePoint); 
 }
 
@@ -162,26 +165,40 @@ float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
 }
 
 
+// RasterizerState
+RasterizerState gRasterizerState
+{
+    CullMode = back;
+    FrontCounterClockwise = false; // Default
+};
+
+
+//BlendState
+BlendState gBlendState
+{
+    BlendEnable[0] = false;
+    RenderTargetWriteMask[0] = 0x0F;
+};
+
+
+//DepthState
+DepthStencilState gDepthStencilState
+{
+    DepthEnable = true;
+    DepthWriteMask = 1;
+    DepthFunc = less;
+    StencilEnable = false;
+};
 // -----------------------------------------------------
 // Technique
 // -----------------------------------------------------
-//technique11 DefaultTechnique
-//{
-//    pass P0
-//    {
-//        SetVertexShader(CompileShader(vs_5_0, VS() ) );
-//        SetGeometryShader(NULL);
-//        SetPixelShader(CompileShader(ps_5_0, PS()));
-//    }
-//}
-
 technique11 PointFilteringTechnique
 {
     pass P0
     {
-        //SetRasterizerState(gRasterizerState);
-       // SetDepthStencilState(gDepthStencilState, 0);
-        //SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(gRasterizerState);
+       SetDepthStencilState(gDepthStencilState, 0);
+        SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Point()));
@@ -192,9 +209,9 @@ technique11 LinearFilteringTechnique
 {
     pass P0
     {
-        //SetRasterizerState(gRasterizerState);
-       // SetDepthStencilState(gDepthStencilState, 0);
-       // SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(gRasterizerState);
+       SetDepthStencilState(gDepthStencilState, 0);
+       SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Linear()));
@@ -205,11 +222,21 @@ technique11 AnisotropicFilteringTechnique
 {
     pass P0
     {
-       // SetRasterizerState(gRasterizerState);
-       // SetDepthStencilState(gDepthStencilState, 0);
-       // SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(gRasterizerState);
+        SetDepthStencilState(gDepthStencilState, 0);
+        SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Anisotropic()));
     }
 }
+
+//technique11 DefaultTechnique
+//{
+//    pass P0
+//    {
+//        SetVertexShader(CompileShader(vs_5_0, VS() ) );
+//        SetGeometryShader(NULL);
+//        SetPixelShader(CompileShader(ps_5_0, PS()));
+//    }
+//}

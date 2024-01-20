@@ -45,16 +45,20 @@ namespace dae
 		ID3D11RenderTargetView* m_RenderTargetView;
 
 		Camera m_Camera;
-		Mesh* m_pMesh{};
+		std::vector<Mesh*> m_pMeshes{};
 		/*Texture2D* m_pDiffuseTexture;
 		Texture2D* m_pGlossines;
 		Texture2D* m_pNormalMap;
 		Texture2D* m_pSpecular;*/
 		Effect* m_pEffect;
 
-		bool m_EnableRotating{false};
+		bool m_EnableRotating{true};
+		bool m_RenderFire{ true };
+		bool m_UseNormalMap{ true };
 
 		bool m_F5Held{false};
-		bool m_F2Held{false};
+		bool m_F4Held{false};
+		bool m_F6Held{ false };
+		bool m_F7Held{ false };
 	};
 }

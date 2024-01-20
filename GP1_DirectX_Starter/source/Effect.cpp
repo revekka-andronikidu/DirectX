@@ -15,8 +15,8 @@ namespace dae
 		//else
 			//std::wcout << L"[FILTERINGMETHOD] Point\n";
 
-		m_pMatWorldViewProjVariable = m_pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
-		if (!m_pMatWorldViewProjVariable->IsValid())
+		m_pWorldViewProjectionVariable = m_pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
+		if (!m_pWorldViewProjectionVariable->IsValid())
 			std::wcout << L"m_pMatWorldViewProjVariable not valid!\n";
 
 		m_pDiffuseMapVariable = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
@@ -24,6 +24,9 @@ namespace dae
 		{
 			std::wcout << L"m_pDiffuseMapVariable not valid!\n";
 		}
+
+		
+			
 
 	}
 
@@ -33,7 +36,9 @@ namespace dae
 		//SAFE_RELEASE(m_pTechnique);	
 		//SAFE_RELEASE(m_pMatWorldViewProjVariable);
 		//SAFE_RELEASE(m_pDiffuseMapVariable);
+		SAFE_RELEASE(m_pUseNormalMap);
 		SAFE_RELEASE(m_pEffect);
+
 	}
 
 	ID3DX11Effect* Effect::GetEffect() const
@@ -53,15 +58,16 @@ namespace dae
 		WorldViewProjection matrix that you then pass to that function.
 		Hint, you’ll have to reinterpret the Matrix data...
 		*/
-		m_pMatWorldViewProjVariable->SetMatrix(reinterpret_cast<const float*>(&matrix));
+		m_pWorldViewProjectionVariable->SetMatrix(reinterpret_cast<const float*>(&matrix));
 	}
 
 	void Effect::SetDiffuseMap(Texture2D* pDiffuseTexture)
 	{
 		if (m_pDiffuseMapVariable)
 			m_pDiffuseMapVariable->SetResource(pDiffuseTexture->GetShaderResourceView());
-		
 	}
+
+	
 
 	void Effect::CycleFilteringMethods()
 	{

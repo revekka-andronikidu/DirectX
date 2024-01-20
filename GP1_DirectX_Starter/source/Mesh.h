@@ -26,6 +26,8 @@ namespace dae
 		void UpdateViewMatrices(const Matrix& viewProjectionMatrix, const Matrix& inverseViewMatrix);
 		void CycleFilteringMethods();
 
+		void SetUseNormalMap(bool useNormalMap) const;
+
 	private:
 
 		//ID3D11Device* m_pDevice{};

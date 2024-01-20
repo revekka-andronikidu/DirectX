@@ -21,7 +21,7 @@ namespace dae
 
 
 		Vector3 origin{};
-		float fovAngle{90.f};
+		float fovAngle{45.f};
 		float fov{ tanf((fovAngle * TO_RADIANS) / 2.f) };
 		float aspectRatio{ 1.f };
 
@@ -32,10 +32,10 @@ namespace dae
 		float totalPitch{};
 		float totalYaw{};
 
-		float nearPlane{ 0.1f };
-		float farPlane{ 100.f };
+		float nearPlane{ 1.f };
+		float farPlane{ 1000.f };
 
-		const float movementSpeed{ 5.f };
+		const float movementSpeed{ 85.f };
 
 		Matrix invViewMatrix{};
 		Matrix viewMatrix{};
@@ -137,16 +137,16 @@ namespace dae
 
 		void KeyboardInput(float deltaTime)
 		{
-			const float speed{ 15.f };
+			const float speed{ 20.f };
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
 			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_UP])
 			{
-				origin += up * -deltaTime * speed;
+				origin -= forward * -deltaTime * speed;
 			}
 			if (pKeyboardState[SDL_SCANCODE_S] || pKeyboardState[SDL_SCANCODE_DOWN])
 			{
-				origin -= up * -deltaTime * speed;
+				origin += forward * -deltaTime * speed;
 			}
 			if (pKeyboardState[SDL_SCANCODE_D] || pKeyboardState[SDL_SCANCODE_RIGHT])
 			{
@@ -179,9 +179,9 @@ namespace dae
 
 			if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT) && !(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)))
 			{
-				
-				totalYaw += deltaTime * static_cast<float>(mouseX) ;
-				totalPitch += deltaTime * static_cast<float>(mouseY);
+				float rotSpeed = movementSpeed / 2;
+				totalYaw += deltaTime * static_cast<float>(mouseX) * rotSpeed;
+				totalPitch += deltaTime * static_cast<float>(mouseY) * rotSpeed;
 
 				const Matrix finalRotation{ Matrix::CreateRotation(totalPitch, totalYaw, 0) };
 				forward = finalRotation.TransformVector(Vector3::UnitZ);

@@ -25,6 +25,7 @@ namespace dae
 
 		virtual void SetWorldMatrix(const Matrix& matrix) {};
 		virtual void SetInverseViewMatrix(const Matrix& matrix){};
+		virtual void SetUseNormalMap(bool useNormalMap) {};
 
 	protected:
 		enum class FilteringMethod
@@ -39,12 +40,15 @@ namespace dae
 
 		ID3DX11Effect* m_pEffect{};
 		ID3DX11EffectTechnique* m_pTechnique{};
+
+		ID3DX11EffectShaderResourceVariable* m_pDiffuseMapVariable{};
 		
-		ID3DX11EffectMatrixVariable* m_pMatWorldViewProjVariable{};
 		
-		ID3DX11EffectShaderResourceVariable* m_pDiffuseMapVariable{};	
+		ID3DX11EffectMatrixVariable* m_pWorldViewProjectionVariable{};
 
 		static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
+
+		ID3DX11EffectScalarVariable* m_pUseNormalMap;
 	};
 };
 

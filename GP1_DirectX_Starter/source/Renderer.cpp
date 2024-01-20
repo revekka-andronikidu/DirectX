@@ -41,7 +41,7 @@ namespace dae {
 		//std::vector<uint32_t> indices{0,1, 2};
 
 	
-		std::vector<Vertex_PosCol> vertices
+	/*	std::vector<Vertex_PosCol> vertices
 		{
 			{{ -3.0f,  3.0f, -2.0f},{ 0.0f, 0.0f}},
 			{ {  0.0f,  3.0f, -2.0f},{ 0.5f, 0.0f} },
@@ -60,7 +60,7 @@ namespace dae {
 				2,5,4,   6,3,4,   4,7,6,
 			7,4,5,   5,8,7,
 		};
-				
+				*/
 		
 		auto pVehicleEffect{ std::make_unique<ShadedEffect>(m_pDevice, L"Resources/PosCol3D.fx") };
 
@@ -74,61 +74,64 @@ namespace dae {
 		pVehicleEffect->SetNormalMap(&vehicleNormalMap);
 		pVehicleEffect->SetSpecularMap(&vehicleSpecular);
 
-		//m_pEffect = new Effect(m_pDevice, L"Resources/PosCol3D.fx");
-		Texture2D uvGrid{ m_pDevice, "Resources/vehicle_normal.png" };
-		//m_pEffect->SetDiffuseMap(&vehicleDiffuseTexture);
+		pVehicleEffect->SetUseNormalMap(&m_UseNormalMap);
 
+		m_pMeshes.push_back(new Mesh{ m_pDevice, "Resources/vehicle.obj", std::move(pVehicleEffect) });
 		
-		m_pMesh = new Mesh(m_pDevice, "Resources/vehicle.obj", std::move(pVehicleEffect));
-		
-		
-		//m_pMesh = new Mesh(m_pDevice,vertices, indices, m_pEffect);
 
+		auto pTransparentEffect{ std::make_unique<Effect>(m_pDevice, L"Resources/Transparent.fx") };
+		Texture2D fireDiffuseTexture{m_pDevice, "Resources/fireFX_diffuse.png"};
+		pTransparentEffect->SetDiffuseMap(&fireDiffuseTexture);
+
+		pTransparentEffect->SetUseNormalMap(&m_UseNormalMap);
+
+		m_pMeshes.push_back(new Mesh{ m_pDevice, "Resources/fireFX.obj", std::move(pTransparentEffect) });
+		
 	}
 
 	Renderer::~Renderer()
 	{
 		DeleteResourceLeaks();
 
-		
-		//delete m_pEffect;
-		delete m_pMesh;
-		//delete m_pDiffuseTexture;
-		//delete m_pGlossines;
-		//delete m_pNormalMap;
-		//delete m_pSpecular;
-		
+		for (auto mesh : m_pMeshes)
+		{
+			delete mesh;
+		}
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_Camera.Update(pTimer);
 
-		constexpr const float rotationSpeed{ 30.f };
+
+		constexpr const float rotationSpeed{ 45.f };
 		if (m_EnableRotating)
 		{
-			//for (const auto& pMesh : m_pMeshes)
-			//{
-			m_pMesh->RotateY(rotationSpeed * TO_RADIANS * pTimer->GetElapsed());
-			
-			//}
+			for (const auto& pMesh : m_pMeshes)
+			{
+				pMesh->RotateY(rotationSpeed * TO_RADIANS * pTimer->GetElapsed());
+			}
 		}
-		m_pMesh->UpdateViewMatrices(m_Camera.GetWorldViewProjection(), m_Camera.GetInverseViewMatrix());
+	
+		for (const auto& pMesh : m_pMeshes)
+		{
+			pMesh->UpdateViewMatrices(m_Camera.GetWorldViewProjection(), m_Camera.GetInverseViewMatrix());
+		}
 
 		const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
-		if (pKeyboardState[SDL_SCANCODE_F2])
+		if (pKeyboardState[SDL_SCANCODE_F4])
 		{
-			if (!m_F2Held)
+			if (!m_F4Held)
 			{
-				//for (const auto& pMesh : m_pMeshes)
-				//{
-					m_pMesh->CycleFilteringMethods();
-				//}
+				for (const auto& pMesh : m_pMeshes)
+				{
+					pMesh->CycleFilteringMethods();
+				}
 			}
-			m_F2Held = true;
+			m_F4Held = true;
 		}
-		else m_F2Held = false;
+		else m_F4Held = false;
 
 		if (pKeyboardState[SDL_SCANCODE_F5])
 		{
@@ -141,6 +144,29 @@ namespace dae {
 			m_F5Held = true;
 		}
 		else m_F5Held = false;
+
+		if (pKeyboardState[SDL_SCANCODE_F6])
+		{
+			if (!m_F6Held)
+			{
+				m_UseNormalMap = !m_UseNormalMap;
+				std::cout << "[NORMAL MAP] ";
+				std::cout << (m_UseNormalMap ? "Normal map enabled\n" : "Normal map disabled\n");
+			}
+			m_F6Held = true;
+		}
+		else m_F6Held = false;
+		m_pMeshes[0]->SetUseNormalMap(m_UseNormalMap);
+
+		if (pKeyboardState[SDL_SCANCODE_F7])
+		{
+			if (!m_F7Held)
+			{
+				m_RenderFire = !m_RenderFire;
+			}
+			m_F7Held = true;
+		}
+		else m_F7Held = false;
 	}
 
 
@@ -150,14 +176,17 @@ namespace dae {
 			return;
 	
 		//1. Clear RTV & DSV
-		constexpr float color[4] = { 0.f, 0.f, 0.5f, 1.f };
+		constexpr float color[4] = { .39f, .59f, .93f, 1.f };
 		//dae::ColorRGB color{ 0.f, 0.f, 0.3f };
 		m_pDeviceContext->ClearRenderTargetView(m_RenderTargetView, color);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		//2. Set pipeline + invoke draw calls (= Render)
-
-		m_pMesh->Render(m_pDeviceContext);
+		
+			m_pMeshes[0]->Render(m_pDeviceContext);
+			if(m_RenderFire)
+				m_pMeshes[1]->Render(m_pDeviceContext);
+		
 
 		//3. Present backbuffer (swap)
 		m_pSwapChain->Present(0, 0);
